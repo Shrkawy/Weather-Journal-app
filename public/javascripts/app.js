@@ -6,10 +6,9 @@ const tempContent = document.getElementById('content');
 const btn = document.getElementById('generate');
 const dateElement = document.getElementById('date');
 
-const kel = 273;
 const weather = {};
 weather.temperature = {
-    unit: "c"
+    unit: "f"
 };
 let serverData = {};
 
@@ -38,7 +37,7 @@ btn.addEventListener('click', async () => {
 // Fetch API Function
 const getWeather = async (zipCode, feeling) => {
     const APIKey = '0a3a43374ac9f65e3079075ad719768f'
-    let API = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&appid=${APIKey}`
+    let API = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&appid=${APIKey}&units=imperial`
     // console.log(API);
 
     await fetch(API)
@@ -49,7 +48,7 @@ const getWeather = async (zipCode, feeling) => {
         })
         .then((data) => {
             weather.feeling = feeling
-            weather.temperature.value = Math.floor(data.main.temp - kel);
+            weather.temperature.value = Math.floor(data.main.temp);
             weather.description = data.weather[0].description;
             weather.city = data.name;
             weather.country = data.sys.country;
@@ -99,10 +98,9 @@ const getServerWeather = async (url) => {
 
 // Change UI Function
 const displayWeather = () => {
-    tempValue.innerHTML = `temprature: ${serverData.temperature.value}°<span>C</span>`;
+    tempValue.innerHTML = `temprature: ${serverData.temperature.value}°<span>F</span>`;
     tempLocation.innerHTML = `I'm living in ${serverData.city}, ${serverData.country}`;
-    tempDescription.innerHTML = `Statue: ${serverData.description}`;
+    tempDescription.innerHTML = `Status: ${serverData.description}`;
     tempContent.innerHTML = `I'm feeling ${serverData.feeling}`;
     displayDate();
 };
-
