@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/post-weather', (req, res, next) => {
-    console.log('Weather Body:',req.body);
+    // console.log('Weather Body:',req.body);
     projectData = req.body
     res.send(projectData)
 })
