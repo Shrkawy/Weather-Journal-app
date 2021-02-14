@@ -6,6 +6,7 @@ const tempContent = document.getElementById('content');
 const btn = document.getElementById('generate');
 const dateElement = document.getElementById('date');
 
+// Weather Objects
 const weather = {};
 weather.temperature = {
     unit: "f"
@@ -36,35 +37,30 @@ btn.addEventListener('click', async () => {
 
 // Fetch API Function
 const getWeather = async (zipCode, feeling) => {
-    const APIKey = '0a3a43374ac9f65e3079075ad719768f'
-    let API = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&appid=${APIKey}&units=imperial`
-    // console.log(API);
+    const APIKey = '0a3a43374ac9f65e3079075ad719768f';
+    let API = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&appid=${APIKey}&units=imperial`;
 
-    await fetch(API)
-        .then((res) => {
-            let data = res.json()
-            // console.log(data)
-            return data;
-        })
-        .then((data) => {
-            weather.feeling = feeling
-            weather.temperature.value = Math.floor(data.main.temp);
-            weather.description = data.weather[0].description;
-            weather.city = data.name;
-            weather.country = data.sys.country;
-        })
-        .then(() => {
-            // console.log(weather);
-            postWeather('/post-weather', weather)
-        })
-        .then(() => {
-            getServerWeather('/get-weather')
-        })
-        .catch( error => {
-            return Promise.reject(error)
-        })
-
+    try {
+        const res = await fetch(API);
+        const data = await res.json();
+        await changeWeatherObject(data, feeling);
+        await postWeather('/post-weather', weather);
+        await getServerWeather('/get-weather');
+        displayWeather();
+    } catch (error) {
+        console.log(error);
+        alert('Something went wrong! please try again');
+    }
 };
+
+// Update weather object
+const changeWeatherObject = async (data, feeling) => {
+    weather.feeling = feeling;
+    weather.temperature.value = Math.floor(data.main.temp);
+    weather.description = data.weather[0].description;
+    weather.city = data.name;
+    weather.country = data.sys.country;
+}
 
 // POST Function to send data to server
 const postWeather = async (url, data) => {
@@ -80,23 +76,18 @@ const postWeather = async (url, data) => {
 }
 
 // GET function to get data from server
-const getServerWeather = async (url) => {
-    await fetch(url)
-        .then(res => {
-            let data = res.json();
-            return data;
-        })
-        .then(data => {
-            // console.log('getServerWeather', data)
-            serverData = data;
-        })
-        .then(() => {
-            // Change UI
-            displayWeather()
-        })
+const getServerWeather = async url => {
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        serverData = data;
+    } catch (error) {
+        console.log(error);
+        alert('Something went wrong! please try again');
+    }
 }
 
-// Change UI Function
+// Update UI Function
 const displayWeather = () => {
     tempValue.innerHTML = `temprature: ${serverData.temperature.value}°<span>F</span>`;
     tempLocation.innerHTML = `I'm living in ${serverData.city}, ${serverData.country}`;
